@@ -1,14 +1,10 @@
 const Koa = require("koa")
-const classic = require("./app/api/v1/classic")
-const book = require("./app/api/v1/book")
+const parser = require("koa-bodyparser")
+const InitManager = require("./core/init")
 
 const app =  new Koa()
+app.use(parser())
 
-app.use(classic.routes())
-app.use(book.routes())
-// app.use(async(ctx,next) => {
-//     if(ctx.path === '/name' && ctx.method === 'GET'){
-        
-//     }
-// })
+InitManager.initCore(app)
+
 app.listen(3008)
