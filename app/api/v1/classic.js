@@ -14,7 +14,6 @@ router.post('/v1/:id/classic/latest',(ctx, next) => {
     const query = ctx.request.query
     const headers = ctx.request.headers
     const body = ctx.request.body
-
     if(true){
         const error = new ParameterException()
         throw error

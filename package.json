@@ -12,6 +12,8 @@
     "koa": "^2.11.0",
     "koa-router": "^7.4.0",
     "koa-bodyparser": "4.2.1",
-    "require-directory": "^2.1.1"
+    "require-directory": "^2.1.1",
+    "lodash": "^4.17.15",
+    "validator": "^12.1.0"
   }
 }
