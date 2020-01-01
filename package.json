@@ -14,6 +14,8 @@
     "koa-bodyparser": "4.2.1",
     "require-directory": "^2.1.1",
     "lodash": "^4.17.15",
+    "mysql2": "^2.0.2",
+    "sequelize": "^5.3.5",
     "validator": "^12.1.0"
   }
 }
