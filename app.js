@@ -1,12 +1,9 @@
 const Koa = require("koa")
 const parser = require("koa-bodyparser")
-const InitManager = require("./core/init")
-const catchError = require("./middlewares/exception")
-
+const InitManager = require("./app/init")
 const app = new Koa()
-app.use(catchError)
-app.use(parser())
 
+app.use(parser())
 InitManager.initCore(app)
 
-app.listen(3000)
+app.listen(3000, () => console.log("程序启动在 3000 端口了"))
