@@ -7,7 +7,7 @@ class UserModel{
     this.dbName = dbName
   }
   insert(dbCollection,insertData){
-    MongoClien.connect(this.dbUrl, (err, client) => {
+    MongoClient.connect(this.dbUrl, (err, client) => {
       console.log("MongoDb 连接成功!");
       const collection  = client.db(this.dbName).collection(dbCollection)
       collection.insert(insertData, (err, result) => {
