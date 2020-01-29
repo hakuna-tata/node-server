@@ -9,6 +9,7 @@
   "author": "https://github.com/hakuna-tata",
   "license": "ISC",
   "dependencies": {
+    "jsonwebtoken": "^8.5.1",
     "koa": "^2.11.0",
     "koa-bodyparser": "4.2.1",
     "koa-json-error": "^3.1.2",
