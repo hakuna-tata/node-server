@@ -1,8 +1,9 @@
 const userModel = require("../models/user")
+const dbCollection = "user"
 
 class UserCtl{
   async findAll(ctx){
-    const users = await userModel.find()
+    const users = await userModel.find(dbCollection,{})
     ctx.body = users
   }
   async register(ctx){

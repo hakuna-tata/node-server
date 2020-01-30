@@ -15,6 +15,7 @@
     "koa-json-error": "^3.1.2",
     "koa-parameter": "^3.0.1",
     "koa-router": "^7.4.0",
+    "mongodb": "^3.5.2",
     "mongoose": "^5.8.10",
     "validator": "^12.1.0"
   }

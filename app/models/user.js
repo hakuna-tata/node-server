@@ -1,51 +1,45 @@
-const mongoose = require('mongoose')
-const { Schema, model } = mongoose
+const mongodb = require('mongodb').MongoClient
+const {dbUrl, dbName} =  require("../config")
 
-const userSchema = new Schema({
-  username: { type: String, required: true },
-  password: { type: String, required: true, select: false },
-})
+class UserModel{
+  constructor(dbUrl,dbName){
+    this.dbUrl = dbUrl
+    this.dbName = dbName
+    this.connectDb()
+  }
 
-module.exports = model("user", userSchema);
+  // 多次连接共享实例对象
+  static getInstance(dbUrl,dbName){
+    if(!UserModel.instance){
+      UserModel.instance = new UserModel(dbUrl,dbName)
+    }
+    // 简化性能提升
+    return UserModel.instance
+  }
 
+  connectDb(){
+    return new Promise((resolve,reject) => {
+      mongodb.connect(this.dbUrl,{ useNewUrlParser: true,  useUnifiedTopology: true },(err,client) => {
+        if(err) {
+          console.log("数据库连接失败")
+          reject(err)
+        }
+        const dbClient = client.db(this.dbName)
+        resolve(dbClient)
+      })
+    })
+  }
 
-// class UserModel{
-//   constructor(dbUrl,dbName){
-//     this.dbUrl = dbUrl
-//     this.dbName = dbName
-//   }
-//   connectDb(callback){
-//     MongoClient.connect(this.dbUrl, (err, client) => {
-//       console.log("bbb")
-//       if(err){
-//         console.log("数据库连接失败")
-//       }
-//       var result = callback(client)
-//       client.close()
-//     })
-//   }
-//   find(dbCollection){
-//     this.connectDb(client => {
-//       const collection = client.db(this.dbName).collection(dbCollection)
-//       collection.find({})
-//     })
-//   }
-//   findOne(dbCollection,name){
-//     this.connectDb(client => {
-//       const collection  = client.db(this.dbName).collection(dbCollection)
-//       collection.findOne({name})
-//     })
-//   }
-//   register(dbCollection,registerData){
-//     const { username, password } = registerData
-//     this.connectDb(client => {
-//       const collection  = client.db(this.dbName).collection(dbCollection)
-//       collection.insertOne({
-//         username,
-//         password
-//       })
-//     })
-//   }
-// }
+  find(dbCollection,searchQuery){
+    return new Promise((resolve, reject) => {
+      this.connectDb().then(db => {
+        db.collection(dbCollection).find(searchQuery).toArray((err,result) => {
+          if(err) reject(err);
+          resolve(result)
+        })
+      })
+    })
+  }
+}
 
-// module.exports = new UserModel(dbUrl, dbName)
+module.exports = UserModel.getInstance(dbUrl, dbName)
