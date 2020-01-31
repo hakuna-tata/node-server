@@ -5,4 +5,4 @@ const TopicSchema = new Schema({
   
 })
 
-module.exports = model("Topic", TopicSchema, "topic");
+module.exports = model("Topic", TopicSchema, "topic")

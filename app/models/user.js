@@ -5,7 +5,7 @@ class UserModel{
   constructor(dbUrl,dbName){
     this.dbUrl = dbUrl
     this.dbName = dbName
-    this.connectDb()
+    this.connectDbPromise = this.connectDb()
   }
 
   // 多次连接共享实例对象
@@ -13,7 +13,6 @@ class UserModel{
     if(!UserModel.instance){
       UserModel.instance = new UserModel(dbUrl,dbName)
     }
-    // 简化性能提升
     return UserModel.instance
   }
 
@@ -24,16 +23,52 @@ class UserModel{
           console.log("数据库连接失败")
           reject(err)
         }
+        console.log("[MongoDB] starting at port 27017")
         const dbClient = client.db(this.dbName)
         resolve(dbClient)
       })
     })
   }
 
-  find(dbCollection,searchQuery){
+  add(dbCollection,addData){
     return new Promise((resolve, reject) => {
-      this.connectDb().then(db => {
-        db.collection(dbCollection).find(searchQuery).toArray((err,result) => {
+      this.connectDbPromise.then(db => {
+        db.collection(dbCollection).insertOne(addData,(err,result) => {
+          if(err) reject(err);
+          resolve(result)
+        })
+      })
+    })
+  }
+
+  delete(dbCollection,deleteData){
+    return new Promise((resolve, reject) => {
+      this.connectDbPromise.then(db => {
+        db.collection(dbCollection).deleteOne(deleteData,(err,result) => {
+          if(err) reject(err);
+          resolve(result)
+        })
+      })
+    })
+  }
+
+  update(dbCollection,condition,updateData){
+    return new Promise((resolve, reject) => {
+      this.connectDbPromise.then(db => {
+        db.collection(dbCollection).updateOne(condition,{
+          $set:updateData
+        },(err,result) => {
+          if(err) reject(err);
+          resolve(result)
+        })
+      })
+    })
+  }
+
+  find(dbCollection,findData){
+    return new Promise((resolve, reject) => {
+      this.connectDbPromise.then(db => {
+        db.collection(dbCollection).find(findData).toArray((err,result) => {
           if(err) reject(err);
           resolve(result)
         })
