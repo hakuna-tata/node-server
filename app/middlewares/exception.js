@@ -1,4 +1,4 @@
-const { HttpException } = require('../../util/httpException')
+const { HttpException } = require('../utils/httpException')
 
 const catchError = async (ctx, next) => {
     try {
@@ -6,18 +6,14 @@ const catchError = async (ctx, next) => {
     } catch (error) {
         if(error instanceof HttpException){
             ctx.body = {
-                msg:error.msg,
-                error_code:error.errorCode,
+                name:error.name,
+                message:error.message,
+                status:error.status,
                 request:`${ctx.method} ${ctx.path}`
             }
-            ctx.status = error.code
+            ctx.status = error.status
         }else{
-            ctx.body = {
-                msg:"we made a mistake",
-                error_code:999,
-                request:`${ctx.method} ${ctx.path}`
-            }
-            ctx.status = 500
+            ctx.body = error
         }
     }
 }
