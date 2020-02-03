@@ -1,4 +1,5 @@
 const userModel = require("../models/user")
+const { RegisterValidator } = require("../validator")
 const dbCollection = "user"
 
 class UserCtl{
@@ -8,6 +9,8 @@ class UserCtl{
   }
 
   async register(ctx){
+    new RegisterValidator().validate(ctx)
+    return
     const { username } = ctx.request.body
     const repeatedUser = await userModel.find(dbCollection,{ username })
     if(repeatedUser.length){

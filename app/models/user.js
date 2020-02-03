@@ -1,33 +1,10 @@
-const mongodb = require('mongodb').MongoClient
+const BaseModel = require("./baseModel")
 const {dbUrl, dbName} =  require("../config")
 
-class UserModel{
-  constructor(dbUrl,dbName){
-    this.dbUrl = dbUrl
-    this.dbName = dbName
-    this.connectDbPromise = this.connectDb()
-  }
+class UserModel extends BaseModel{
 
-  // 多次连接共享实例对象
-  static getInstance(dbUrl,dbName){
-    if(!UserModel.instance){
-      UserModel.instance = new UserModel(dbUrl,dbName)
-    }
-    return UserModel.instance
-  }
-
-  connectDb(){
-    return new Promise((resolve,reject) => {
-      mongodb.connect(this.dbUrl,{ useNewUrlParser: true,  useUnifiedTopology: true },(err,client) => {
-        if(err) {
-          console.log("数据库连接失败")
-          reject(err)
-        }
-        console.log("[MongoDB] starting at port 27017")
-        const dbClient = client.db(this.dbName)
-        resolve(dbClient)
-      })
-    })
+  constructor(){
+    super(dbUrl,dbName)
   }
 
   add(dbCollection,addData){
@@ -77,4 +54,4 @@ class UserModel{
   }
 }
 
-module.exports = UserModel.getInstance(dbUrl, dbName)
+module.exports = new UserModel()
