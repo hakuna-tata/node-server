@@ -1,10 +1,4 @@
 const validator = require("validator")
-const {
-  get,
-  last,
-  set,
-  cloneDeep
-} = require("lodash")
 
 class MyValidator{
   constructor(){
@@ -24,13 +18,13 @@ class MyValidator{
   _getParamValue(key){
     let value
     // 1.没有处理对象键值嵌套对象或者数组等参数类型
-    // 2.没有处理可选参数传递默认值
     for(let element in this.data){
       if(this.data[element][key]){
         value = this.data[element][key]
-        return value
+        break
       }
     }
+    return value
   }
 
   _getDefinedRule(originObj){
@@ -44,8 +38,12 @@ class MyValidator{
     }
   }
 
-  _check(value,rule){
-
+  _checkRules(value,rules){
+    let ruleResult = {}
+    rules.forEach(rule => {
+      ruleResult = rule.validate(value)
+    })
+    console.log(ruleResult)
   }
   
   validate(ctx){
@@ -54,8 +52,16 @@ class MyValidator{
     this._getDefinedRule.call(this,this)
     for(let key in this.definedRule){
       let value = this._getParamValue(key)
-      this._check(value,this.definedRule[key])
+      this._checkRules(value,this.definedRule[key])
     }
+  }
+}
+
+class RuleResult{
+  constructor(pass = false, message, value = null){
+    Object.assign(this,{
+      pass, message, value
+    })
   }
 }
 
@@ -64,14 +70,29 @@ class Rule{
     Object.assign(this,{
       validateFunction, message, options
     })
-    if(this.validateFunction === "isOptional"){
-      this.optional = true
-      this.defaultValue = options && options[0]
-    }
   }
 
-  validate(context){
-
+  validate(value){
+    if(!value){
+      // 自定义可选参数
+      if(this.validateFunction === "isOptional"){
+        let defaultValue = this.options && this.options[0]
+        return new RuleResult(true, "", defaultValue)
+      }else{
+        return new RuleResult(false, "字段是必传参数")
+      }
+    }
+    // validator不存在的api
+    if(!validator[this.validateFunction]){
+      let msg = `${this.validateFunction}不存在`
+      return new RuleResult(false, msg)
+    }
+    // 自定义函数
+    else if(typeof this.validateFunction === "function"){
+      return this.validateFunction(value,...this.options)
+    }
+    let result = validator[this.validateFunction](value,...this.options)
+    return new RuleResult(result, result ? "" : "参数错误", value)
   }
 }
 
