@@ -6,14 +6,18 @@ const catchError = async (ctx, next) => {
     } catch (error) {
         if(error instanceof HttpException){
             ctx.body = {
-                name:error.name,
                 message:error.message,
-                status:error.status,
+                code:error.code,
                 request:`${ctx.method} ${ctx.path}`
             }
             ctx.status = error.status
         }else{
-            ctx.body = error
+            ctx.body = {
+                message: "we make a mistake",
+                code: -1,
+                request: `${ctx.method} ${ctx.path}`
+              }
+            ctx.status = 500
         }
     }
 }

@@ -5,7 +5,7 @@ class RegisterValidator extends MyValidator{
     super()
     this.username= [
       new Rule("isLength", "昵称不符合长度规范", {
-        min: 4,
+        min: 6,
         max: 32
       }),
     ]

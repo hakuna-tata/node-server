@@ -1,4 +1,5 @@
 const validator = require("validator")
+const { ParameterException } = require('./httpException')
 
 class MyValidator{
   constructor(){
@@ -38,12 +39,14 @@ class MyValidator{
     }
   }
 
-  _checkRules(value,rules){
+  _checkRules(value,rules,key){
     let ruleResult = {}
     rules.forEach(rule => {
-      ruleResult = rule.validate(value)
+      ruleResult = rule.validate(value,key)
+      if(!ruleResult.pass){
+        throw new ParameterException(ruleResult.message)
+      }
     })
-    console.log(ruleResult)
   }
   
   validate(ctx){
@@ -52,7 +55,7 @@ class MyValidator{
     this._getDefinedRule.call(this,this)
     for(let key in this.definedRule){
       let value = this._getParamValue(key)
-      this._checkRules(value,this.definedRule[key])
+      this._checkRules(value,this.definedRule[key],key)
     }
   }
 }
@@ -72,27 +75,26 @@ class Rule{
     })
   }
 
-  validate(value){
+  validate(value,key){
     if(!value){
       // 自定义可选参数
       if(this.validateFunction === "isOptional"){
         let defaultValue = this.options && this.options[0]
-        return new RuleResult(true, "", defaultValue)
+        return new RuleResult(true, '', defaultValue)
       }else{
-        return new RuleResult(false, "字段是必传参数")
+        return new RuleResult(false, `${key}是必传参数`)
       }
     }
     // validator不存在的api
     if(!validator[this.validateFunction]){
-      let msg = `${this.validateFunction}不存在`
-      return new RuleResult(false, msg)
+      return new RuleResult(false, `${this.validateFunction}api不存在`)
     }
     // 自定义函数
     else if(typeof this.validateFunction === "function"){
       return this.validateFunction(value,...this.options)
     }
     let result = validator[this.validateFunction](value,...this.options)
-    return new RuleResult(result, result ? "" : "参数错误", value)
+    return new RuleResult(result, result ? "" : `${key}参数错误`, value)
   }
 }
 
