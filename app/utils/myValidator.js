@@ -57,6 +57,7 @@ class MyValidator{
       let value = this._getParamValue(key)
       this._checkRules(value,this.definedRule[key],key)
     }
+    return true
   }
 }
 

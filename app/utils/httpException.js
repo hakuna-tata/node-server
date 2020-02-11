@@ -8,15 +8,35 @@ class HttpException extends Error{
 }
 
 class ParameterException extends HttpException{
-    constructor(message, code){
+    constructor(message){
         super()
-        this.message = message || "参数错误"
-        this.code = -1
-        this.status = 400
+        Object.assign(this,{
+            message, status: 400
+        })
+    }
+}
+
+class ConflictException extends HttpException{
+    constructor(message){
+        super()
+        Object.assign(this,{
+            message, status: 409
+        })
+    }
+}
+
+class Success extends HttpException {
+    constructor(message = "OK", code = 0) {
+        super()
+        Object.assign(this,{
+            message, code, status: 201
+        })
     }
 }
 
 module.exports = {
     HttpException,
-    ParameterException
+    ParameterException,
+    ConflictException,
+    Success
 }

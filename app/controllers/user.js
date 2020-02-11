@@ -1,5 +1,6 @@
 const userModel = require("../models/user")
 const { RegisterValidator } = require("../validator")
+const { ConflictException, Success } = require("../utils/httpException")
 const dbCollection = "user"
 
 class UserCtl{
@@ -9,15 +10,14 @@ class UserCtl{
   }
 
   async register(ctx){
-    new RegisterValidator().validate(ctx)
-    return
+    const v = await new RegisterValidator().validate(ctx)
     const { username } = ctx.request.body
     const repeatedUser = await userModel.find(dbCollection,{ username })
     if(repeatedUser.length){
-      ctx.body = "用户已存在"
+      throw new ConflictException("用户名已被占用")
     }else{
-       const users = await userModel.add(dbCollection,ctx.request.body)
-       ctx.body = users
+      await userModel.add(dbCollection,ctx.request.body)
+      throw new Success()
     }
   }
 

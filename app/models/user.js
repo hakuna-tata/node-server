@@ -52,6 +52,10 @@ class UserModel extends BaseModel{
       })
     })
   }
+
+  findOne(dbCollection,findData){
+    return new Promise()
+  }
 }
 
 module.exports = new UserModel()

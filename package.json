@@ -2,18 +2,20 @@
   "name": "koa-server",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "server": "nodemon app.js"
+    "server": "nodemon app.js",
+    "test": "jest --watch",
+    "test:cov": "jest --coverage"
   },
   "author": "https://github.com/hakuna-tata",
   "license": "ISC",
   "dependencies": {
+    "jest": "^25.1.0",
     "jsonwebtoken": "^8.5.1",
     "koa": "^2.11.0",
     "koa-bodyparser": "4.2.1",
     "koa-router": "^7.4.0",
-    "lodash": "^4.17.15",
     "mongodb": "^3.5.2",
     "mongoose": "^5.8.10",
     "validator": "^12.2.0"
