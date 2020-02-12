@@ -16,6 +16,24 @@ class ParameterException extends HttpException{
     }
 }
 
+class ForbiddenException extends HttpException{
+    constructor(message){
+        super()
+        Object.assign(this,{
+            message, status: 403
+        })
+    }
+}
+
+class NotFoundException extends HttpException{
+    constructor(message){
+        super()
+        Object.assign(this,{
+            message, status: 404
+        })
+    }
+}
+
 class ConflictException extends HttpException{
     constructor(message){
         super()
@@ -25,18 +43,19 @@ class ConflictException extends HttpException{
     }
 }
 
-class Success extends HttpException {
-    constructor(message = "OK", code = 0) {
-        super()
-        Object.assign(this,{
-            message, code, status: 201
-        })
+const Success = (ctx,status) => {
+    ctx.body = {
+        message: "OK",
+        code: 0
     }
+    ctx.status = status
 }
 
 module.exports = {
     HttpException,
     ParameterException,
+    ForbiddenException,
+    NotFoundException,
     ConflictException,
     Success
 }

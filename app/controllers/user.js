@@ -1,9 +1,17 @@
 const userModel = require("../models/user")
 const { RegisterValidator } = require("../validator")
-const { ConflictException, Success } = require("../utils/httpException")
+const { ConflictException, ForbiddenException, NotFoundException,Success } = require("../utils/httpException")
 const dbCollection = "user"
 
 class UserCtl{
+
+  async checkOwner(ctx, next){
+    if(ctx.params.id !== ctx.state.user._id){
+      throw new ForbiddenException("没有权限")
+    }
+    await next()
+  }
+
   async findAll(ctx){
     const users = await userModel.find(dbCollection,{})
     ctx.body = users
@@ -11,24 +19,26 @@ class UserCtl{
 
   async register(ctx){
     const v = await new RegisterValidator().validate(ctx)
-    const { username } = ctx.request.body
-    const repeatedUser = await userModel.find(dbCollection,{ username })
-    if(repeatedUser.length){
+    const { username, email } = ctx.request.body
+    const repeatedUsername = await userModel.findOne(dbCollection,{ username })
+    const repeatedEmail = await userModel.findOne(dbCollection,{ email })
+    if(repeatedUsername && repeatedUsername.username){
       throw new ConflictException("用户名已被占用")
-    }else{
-      await userModel.add(dbCollection,ctx.request.body)
-      throw new Success()
     }
+    if(repeatedEmail && repeatedEmail.email){
+      throw new ConflictException("该邮箱已注册")
+    }
+    await userModel.add(dbCollection,ctx.request.body)
+    Success(ctx, 201)
   }
 
   async remove(ctx){
-    const username = ctx.params.id
-    const result = await userModel.delete(dbCollection,{username})
-    ctx.body = result
-  }
-
-  async update(ctx){
-
+    const id = ctx.params.id
+    const user = await userModel.remove(dbCollection,id)
+    if(user.value === null){
+      throw new NotFoundException("用户不存在")
+    }
+    Success(ctx, 204)
   }
 }
 

@@ -1,5 +1,7 @@
+const ObjectID  = require('mongodb').ObjectID
 const BaseModel = require("./baseModel")
 const {dbUrl, dbName} =  require("../config")
+
 
 class UserModel extends BaseModel{
 
@@ -18,10 +20,10 @@ class UserModel extends BaseModel{
     })
   }
 
-  delete(dbCollection,deleteData){
+  remove(dbCollection,id){
     return new Promise((resolve, reject) => {
       this.connectDbPromise.then(db => {
-        db.collection(dbCollection).deleteOne(deleteData,(err,result) => {
+        db.collection(dbCollection).findOneAndDelete({"_id":new ObjectID(id)},(err,result) => {
           if(err) reject(err);
           resolve(result)
         })
@@ -54,7 +56,14 @@ class UserModel extends BaseModel{
   }
 
   findOne(dbCollection,findData){
-    return new Promise()
+    return new Promise((resolve, reject) => {
+      this.connectDbPromise.then(db => {
+        db.collection(dbCollection).findOne(findData,(err,result) => {
+          if(err) reject(err);
+          resolve(result)
+        })
+      })
+    })
   }
 }
 
